@@ -1,38 +1,23 @@
 * Adding operator[] to =std::tuple=
 
+WARNING: This is a draft.
+
 ** Rationale
 
 Currently in order to access tuples, we need to use the
-=std::get<>= family of functions.
+=std::get<>= family of functions. This is non-uniform to
+the usual way we index the rest of the types and also
+more verbose.
 
 The user expectation is usually that a tuple should be indexable
-with operator[]. This is the convention followed by the rest of the
-library components and gives more interface uniformity.
-=std::get<>= is also more verbose.
+with operator[]. This convention would give more interface uniformity:
+=vector=, =array=, =map=, =unordered_map= and plain arrays.
 
 
 ** Proposal
 
-I propose to add =operator[]= to =std::tuple= in the following way:
-
-
-#+BEGIN_src C++
-  template <class...Types>
-  template<std::size_t I>
-  constexpr std::tuple_element_t<I, tuple<Types...> >&
-      std::tuple<Types...>::operator[](std::integral_constant<std::size_t, I>) &;
-
-  template <class...Types>
-  template<std::size_t I>
-  constexpr std::tuple_element_t<I, tuple<Types...> >&&
-      std::tuple<Types...>::operator[](std::integral_constant<std::size_t, I>) &&;
-
-  template <class...Types>
-  template<std::size_t I>
-  constexpr std::tuple_element_t<I, tuple<Types...> >&&
-      std::tuple<Types...>::operator[](std::integral_constant<std::size_t, I>) const;
-#+END_src
-
+I propose to add =operator[]= to =std::tuple= making use of
+=std::integral_constant=.
 
 This way we could do the following:
 
@@ -55,7 +40,7 @@ f(fib[0is], fib[1is], fib[2is], fib[3is], fib[4is]);
 #+END_src
 
 Note: having user-defined literals or var templates
-for =std::integral_consstant= would be part of another proposal.
+for =std::integral_constant= would be part of another proposal.
 
 ** Indexing by type
 
@@ -77,13 +62,56 @@ auto const & name = person[type<std::string>];
 
 Note: having type wrappers would be part of another proposal.
 
+** Implementation experience
+
+TODO: Mention Boost.Hana tuples.
+
 
 ** Open questions
 
 - Should we have standard variable templates or user-defined literals
   for =std::integral_constant=?
 - Should =std::get<>= get deprecated?
+- Should we add =operator[]= to =std::pair=?
+
+
+** New signatures
+
+#+BEGIN_src C++
+  template <class...Types>
+  template<std::size_t I>
+  constexpr std::tuple_element_t<I, tuple<Types...> >&
+      std::tuple<Types...>::operator[](std::integral_constant<std::size_t, I>) &;
+
+  template <class...Types>
+  template<std::size_t I>
+  constexpr std::tuple_element_t<I, tuple<Types...> >&&
+      std::tuple<Types...>::operator[](std::integral_constant<std::size_t, I>) &&;
+
+  template <class...Types>
+  template<std::size_t I>
+  constexpr std::tuple_element_t<I, tuple<Types...> >&&
+      std::tuple<Types...>::operator[](std::integral_constant<std::size_t, I>) const;
+
+
+  template <class...Types>
+  template<class T>
+  constexpr T &
+      std::tuple<Types...>::operator[](type<T>) &;
+
+  template <class...Types>
+  template<class T>
+  constexpr T &&
+      std::tuple<Types...>::operator[](type<T>) &&;
+
+  template <class...Types>
+  template<class T>
+  constexpr T const &
+      std::tuple<Types...>::operator[](type<T>) const;
+
+#+END_src
 
 
 ** References
+
 - List here Boost.Hana author and relevant links.
