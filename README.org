@@ -78,6 +78,7 @@ TODO: Mention Boost.Hana tuples.
 ** New signatures
 
 #+BEGIN_src C++
+  //Index access
   template <class...Types>
   template<std::size_t I>
   constexpr std::tuple_element_t<I, tuple<Types...> >&
@@ -94,6 +95,7 @@ TODO: Mention Boost.Hana tuples.
       std::tuple<Types...>::operator[](std::integral_constant<std::size_t, I>) const;
 
 
+  //Type access
   template <class...Types>
   template<class T>
   constexpr T &
