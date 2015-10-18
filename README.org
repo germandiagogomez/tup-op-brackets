@@ -1,0 +1,53 @@
+* Adding operator[] to =std::tuple=.
+
+** Rationale
+
+Currently in order to access tuples, we need to use the
+=std::get<>= family of functions.
+
+The user expectation is usually that a tuple should be indexable
+with operator[]. This is the convention followed by the rest of the
+library components and gives more interface uniformity.
+=std::get<>= is also more verbose.
+
+
+** Proposal
+
+I propose to add =operator[]= to =std::tuple= in the following way:
+
+
+#+BEGIN_src C++
+  template <class...Types>
+  template<std::size_t I>
+  constexpr std::tuple_element_t<I, tuple<Types...> >&
+      std::tuple<Types...>::operator[](std::integral_constant<std::size_t, I>) &;
+#+END_src
+
+
+This way we could do the following:
+
+#+BEGIN_src C++
+template <std::size_t I>
+constexpr std::integral_constant<std::size_t, I> c;
+
+auto fib = make_tuple(1, 1, 2, 3, 5, 8, 13, 21);
+
+//Before:
+f(std::get<0>(fib), std::get<1>(fib), std::get<2>(fib), std::get<3>(fib),
+  std::get<4>(fib));
+
+//Now:
+f(fib[c<0>], fib[c<1>], fib[c<2>], fib[c<3>], fib[c<4>]);
+
+
+//Or with a standard user-defined literal:
+f(fib[0is], fib[1is], fib[2is], fib[3is], fib[4is]);
+#+END_src Other open questions
+
+** Open questions
+
+- Should we have standard variable templates or user-defined literals
+  for =std::integral_constant=s?
+
+** References
+- List here Boost.Hana author and relevant links.
